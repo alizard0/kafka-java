@@ -60,6 +60,7 @@ Map<String, Object> props = new HashMap<>();
 ```
 **Publish Events**
 ```
+@Configuration
 @EnableKafka
 public class KafkaConfig {
     @Bean
