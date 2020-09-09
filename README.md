@@ -22,8 +22,78 @@ In short, events are sorted and persisted in topics which works like a filesyste
 
 For official documentation, visit https://docs.spring.io/spring-kafka/reference/html/
 
-**Configuration**
-
-**Event Listeners**
-
+**Maven Dependency**
+```
+<dependency>
+  <groupId>org.springframework.kafka</groupId>
+  <artifactId>spring-kafka</artifactId>
+  <version>2.6.0</version>
+</dependency>
+```
+**Consumer Properties**
+```
+public Map<String, Object> consumerProps() {
+    Map<String, Object> props = new HashMap<>();
+    props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+    props.put(ConsumerConfig.GROUP_ID_CONFIG, group);
+    props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, true);
+    props.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, "100");
+    props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "15000");
+    props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, IntegerDeserializer.class);
+    props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+    return props;
+}
+```
+**Producer Properties**
+```
+public Map<String, Object> producerProps() {
+Map<String, Object> props = new HashMap<>();
+    props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+    props.put(ProducerConfig.RETRIES_CONFIG, 0);
+    props.put(ProducerConfig.BATCH_SIZE_CONFIG, 16384);
+    props.put(ProducerConfig.LINGER_MS_CONFIG, 1);
+    props.put(ProducerConfig.BUFFER_MEMORY_CONFIG, 33554432);
+    props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, IntegerSerializer.class);
+    props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+    return props;
+}
+```
 **Publish Events**
+```
+@EnableKafka
+public class KafkaConfig {
+    @Bean
+    public Map<String, Object> producerConfigs() {
+        // your properties
+    }
+    
+    @Bean
+    public ProducerFactory<Integer, String> producerFactory() {
+        return new DefaultKafkaProducerFactory<>(producerConfigs());
+    }
+
+    @Bean
+    public KafkaTemplate<Integer, String> kafkaTemplate() {
+        return new KafkaTemplate<Integer, String>(producerFactory());
+    }
+}
+
+public class KafkaFacade {
+    @Autowired
+    KafkaTemplate<Intenger, String> template;
+    
+    public publishEvent(final MyEvent evt) {
+        ProducerRecord<String, String> record = buildRecord(evt);
+        template.send(record);
+    }
+}
+```
+**Event Listener**
+```
+public class MyEventListener {
+    @KafkaListener(topics = {"my.topic.name"}, groupId = "my.kafka.group.id")
+    public void handle(@Payload MyEvent event) {
+        // your business logic
+    }
+}
+```
