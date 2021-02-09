@@ -23,7 +23,7 @@ In short, events are sorted and persisted in topics which works like a filesyste
 For official documentation, visit https://docs.spring.io/spring-kafka/reference/html/
 
 **Maven Dependency**
-```
+```java
 <dependency>
   <groupId>org.springframework.kafka</groupId>
   <artifactId>spring-kafka</artifactId>
@@ -31,7 +31,7 @@ For official documentation, visit https://docs.spring.io/spring-kafka/reference/
 </dependency>
 ```
 **Consumer Properties**
-```
+```java
 public Map<String, Object> consumerProps() {
     Map<String, Object> props = new HashMap<>();
     props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
@@ -45,7 +45,7 @@ public Map<String, Object> consumerProps() {
 }
 ```
 **Producer Properties**
-```
+```java
 public Map<String, Object> producerProps() {
 Map<String, Object> props = new HashMap<>();
     props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
@@ -59,7 +59,7 @@ Map<String, Object> props = new HashMap<>();
 }
 ```
 **Publish Events**
-```
+```java
 @Configuration
 @EnableKafka
 public class KafkaConfig {
@@ -90,7 +90,7 @@ public class KafkaFacade {
 }
 ```
 **Event Listener**
-```
+```java
 public class MyEventListener {
     @KafkaListener(topics = {"my.topic.name"}, groupId = "my.kafka.group.id")
     public void handle(@Payload MyEvent event) {
